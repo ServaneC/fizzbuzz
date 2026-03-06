@@ -1,9 +1,10 @@
-package handler
+package handlers
 
 import (
 	"encoding/json"
-	"fizzbuzz/pkg/fizzbuzz"
-	"fizzbuzz/pkg/stats"
+	"errors"
+	"fizzbuzz/internal/fizzbuzz"
+	"fizzbuzz/internal/stats"
 	"net/http"
 )
 
@@ -17,12 +18,12 @@ func (h *Handler) FizzBuzzHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&params)
 	if err != nil {
-		http.Error(w, "Invalid JSON body", http.StatusBadRequest)
+		WriteError(w, http.StatusBadRequest, ErrInvalidJSON, err)
 		return
 	}
 
-	if !params.IsValid() {
-		http.Error(w, "Invalid or missing parameters", http.StatusBadRequest)
+	if err := params.IsValid(); err != nil {
+		WriteError(w, http.StatusBadRequest, ErrInvalidParameters, err)
 		return
 	}
 
@@ -30,26 +31,21 @@ func (h *Handler) FizzBuzzHandler(w http.ResponseWriter, r *http.Request) {
 
 	result := fizzbuzz.Generate(params)
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(result)
+	WriteJSON(w, http.StatusOK, FizzBuzzResponse{
+		Result: result,
+	})
 }
 
 // GET /stats
 func (h *Handler) StatsHandler(w http.ResponseWriter, r *http.Request) {
 	params, hits, found := h.Stats.GetMostFrequent()
 	if !found {
-		http.Error(w, "No data yet", http.StatusNotFound)
+		WriteError(w, http.StatusNotFound, ErrNotFound, errors.New("no data yet"))
 		return
 	}
 
-	response := struct {
-		fizzbuzz.Params
-		Hits int `json:"hits"`
-	}{
+	WriteJSON(w, http.StatusOK, StatsResponse{
 		Params: params,
 		Hits:   hits,
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	})
 }

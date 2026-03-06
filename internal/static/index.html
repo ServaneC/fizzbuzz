@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>FizzBuzz API Demo</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 600px;
+            margin: 2rem auto;
+        }
+
+        input,
+        button {
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            width: 100%;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>FizzBuzz Generator</h1>
+    <input id="int1" type="number" placeholder="int1 (e.g., 3)" />
+    <input id="int2" type="number" placeholder="int2 (e.g., 5)" />
+    <input id="limit" type="number" placeholder="limit (e.g., 15)" />
+    <input id="str1" type="text" placeholder="str1 (e.g., Fizz)" />
+    <input id="str2" type="text" placeholder="str2 (e.g., Buzz)" />
+    <button onclick="generateFizzBuzz()">Generate</button>
+    <ul id="output"></ul>
+
+    <script>
+        async function generateFizzBuzz() {
+            const int1 = parseInt(document.getElementById("int1").value);
+            const int2 = parseInt(document.getElementById("int2").value);
+            const limit = parseInt(document.getElementById("limit").value);
+            const str1 = document.getElementById("str1").value;
+            const str2 = document.getElementById("str2").value;
+
+            const response = await fetch("/fizzbuzz", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ int1, int2, limit, str1, str2 })
+            });
+
+            const data = await response.json();
+            const ul = document.getElementById("output");
+            ul.innerHTML = "";
+            if (response.ok) {
+                // Normal FizzBuzz result
+                data.result.forEach(item => {
+                    const li = document.createElement("li");
+                    li.textContent = item;
+                    ul.appendChild(li);
+                });
+            } else {
+                // Error returned by the server
+                const li = document.createElement("li");
+                li.textContent = data.message || data.error || "Unknown error";
+                li.style.color = "red";
+                ul.appendChild(li);
+            }
+        }
+    </script>
+</body>
+
+</html>
