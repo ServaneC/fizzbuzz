@@ -11,9 +11,9 @@ More details in the [Live API](#live-api) section
 ## What is Fizzbuzz ? 
 
 FizzBuzz is a classic programming exercise where numbers from 1 to 100 are printed with the following rules:
-- Multiples of **3** are replaced with **"Fizz"**
-- Multiples of **5** are replaced with **"Buzz"**
-- Multiples of both with **"FizzBuzz"**
+- Multiples of **3** are replaced with **"fizz"**
+- Multiples of **5** are replaced with **"buzz"**
+- Multiples of both with **"fizzbuzz"**
 
 Example output:
 
